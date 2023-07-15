@@ -16,7 +16,6 @@ import java.util.Date;
 @Table(name = "trains")
 public class Train {
 
-    //    treno( numtreno, orapartenza, oraarrivo, AR )
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "train_id")
