@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:8889
--- Generation Time: Jul 15, 2023 at 10:18 AM
+-- Generation Time: Jul 16, 2023 at 01:27 PM
 -- Server version: 5.7.34
 -- PHP Version: 7.4.21
 
@@ -30,22 +30,30 @@ SET time_zone = "+00:00";
 CREATE TABLE `journeys` (
   `journey_id` bigint(20) NOT NULL,
   `train_id` bigint(20) DEFAULT NULL,
-  `user_id` bigint(20) DEFAULT NULL
+  `user_id` bigint(20) DEFAULT NULL,
+  `comments` varchar(255) DEFAULT NULL,
+  `date` datetime(6) DEFAULT NULL,
+  `true_arrival` datetime(6) DEFAULT NULL,
+  `true_departure` datetime(6) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `roles`
+--
+
+CREATE TABLE `roles` (
+  `role_id` bigint(20) NOT NULL,
+  `name` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
--- Dumping data for table `journeys`
+-- Dumping data for table `roles`
 --
 
-INSERT INTO `journeys` (`journey_id`, `train_id`, `user_id`) VALUES
-(1, 1, 3),
-(2, 1, 1),
-(4, 1, 2),
-(5, 1, 4),
-(6, 3, 1),
-(7, 3, 4),
-(8, 3, 2),
-(9, 3, 3);
+INSERT INTO `roles` (`role_id`, `name`) VALUES
+(1, 'ROLE_ADMIN');
 
 -- --------------------------------------------------------
 
@@ -60,14 +68,6 @@ CREATE TABLE `trains` (
   `departure_time` datetime(6) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
---
--- Dumping data for table `trains`
---
-
-INSERT INTO `trains` (`train_id`, `arrival_time`, `departure_arrival`, `departure_time`) VALUES
-(1, '2023-07-16 18:30:00.000000', 1, '2023-07-16 21:30:00.000000'),
-(3, '2023-07-16 06:00:00.000000', 0, '2023-07-16 09:00:00.000000');
-
 -- --------------------------------------------------------
 
 --
@@ -76,19 +76,38 @@ INSERT INTO `trains` (`train_id`, `arrival_time`, `departure_arrival`, `departur
 
 CREATE TABLE `users` (
   `user_id` bigint(20) NOT NULL,
-  `name` varchar(255) DEFAULT NULL,
-  `surname` varchar(255) DEFAULT NULL
+  `email` varchar(255) NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `password` varchar(255) NOT NULL,
+  `surname` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`user_id`, `name`, `surname`) VALUES
-(1, 'Andrei', 'Antal'),
-(2, 'Marco', 'Niero'),
-(3, 'Dario', 'Niero'),
-(4, 'Erika', 'Antal');
+INSERT INTO `users` (`user_id`, `email`, `name`, `password`, `surname`) VALUES
+(1, 'demo@test.it', 'demo', '$2a$10$2As//8ev5JASU61fTbCrZ.Pz/bBNqtl9.VrCQyb1zPvDE42cwb4JG', 'test'),
+(2, 'ludo@cipoletta.it', 'ludo', '$2a$10$vhnPh/EeB3aALRHT6d48DO82vktypqW8dl0gptcj34w.guw.ycDmO', 'cipolletta');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `users_roles`
+--
+
+CREATE TABLE `users_roles` (
+  `user_id` bigint(20) NOT NULL,
+  `role_id` bigint(20) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `users_roles`
+--
+
+INSERT INTO `users_roles` (`user_id`, `role_id`) VALUES
+(1, 1),
+(2, 1);
 
 --
 -- Indexes for dumped tables
@@ -103,6 +122,13 @@ ALTER TABLE `journeys`
   ADD KEY `FK1um7r8cm6rnn4dinfmarjjmqv` (`user_id`);
 
 --
+-- Indexes for table `roles`
+--
+ALTER TABLE `roles`
+  ADD PRIMARY KEY (`role_id`),
+  ADD UNIQUE KEY `UK_ofx66keruapi6vyqpv6f2or37` (`name`);
+
+--
 -- Indexes for table `trains`
 --
 ALTER TABLE `trains`
@@ -112,7 +138,15 @@ ALTER TABLE `trains`
 -- Indexes for table `users`
 --
 ALTER TABLE `users`
-  ADD PRIMARY KEY (`user_id`);
+  ADD PRIMARY KEY (`user_id`),
+  ADD UNIQUE KEY `UK_6dotkott2kjsp8vw4d0m25fb7` (`email`);
+
+--
+-- Indexes for table `users_roles`
+--
+ALTER TABLE `users_roles`
+  ADD KEY `FKj6m8fwv7oqv74fcehir1a9ffy` (`role_id`),
+  ADD KEY `FK2o0jvgh89lemvvo17cbqvdxaa` (`user_id`);
 
 --
 -- AUTO_INCREMENT for dumped tables
@@ -122,19 +156,25 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `journeys`
 --
 ALTER TABLE `journeys`
-  MODIFY `journey_id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `journey_id` bigint(20) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `roles`
+--
+ALTER TABLE `roles`
+  MODIFY `role_id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `trains`
 --
 ALTER TABLE `trains`
-  MODIFY `train_id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `train_id` bigint(20) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `user_id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `user_id` bigint(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- Constraints for dumped tables
@@ -146,6 +186,13 @@ ALTER TABLE `users`
 ALTER TABLE `journeys`
   ADD CONSTRAINT `FK1um7r8cm6rnn4dinfmarjjmqv` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`),
   ADD CONSTRAINT `FKeret9h6hyu7sqcyw7njebw64g` FOREIGN KEY (`train_id`) REFERENCES `trains` (`train_id`);
+
+--
+-- Constraints for table `users_roles`
+--
+ALTER TABLE `users_roles`
+  ADD CONSTRAINT `FK2o0jvgh89lemvvo17cbqvdxaa` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`),
+  ADD CONSTRAINT `FKj6m8fwv7oqv74fcehir1a9ffy` FOREIGN KEY (`role_id`) REFERENCES `roles` (`role_id`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
