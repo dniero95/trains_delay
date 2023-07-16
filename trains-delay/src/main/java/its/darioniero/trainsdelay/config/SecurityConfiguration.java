@@ -31,12 +31,14 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests((authorize) ->
                         authorize.requestMatchers("/register/**").permitAll()
                                 .requestMatchers("/index").permitAll()
+                                .requestMatchers("/insert-journey").hasRole("ADMIN")
                                 .requestMatchers("/users").hasRole("ADMIN")
+
                 ).formLogin(
                         form -> form
                                 .loginPage("/login")
                                 .loginProcessingUrl("/login")
-                                .defaultSuccessUrl("/users")
+                                .defaultSuccessUrl("/insert-journey")
                                 .permitAll()
                 ).logout(
                         logout -> logout
